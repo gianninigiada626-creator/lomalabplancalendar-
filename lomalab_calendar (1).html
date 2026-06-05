@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LomaLab — Content Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black: #000000; --gray: #808080; --white: #ffffff;
+    --bg: #E7E7E7; --community: #b0a090; --border: #d0d0d0; --row-hover: #f5f5f5;
+  }
+  body { font-family: 'Montserrat', sans-serif; background: var(--bg); color: var(--black); min-height: 100vh; font-size: 13px; }
+
+  header { background: var(--black); padding: 24px 40px; display: flex; align-items: center; justify-content: space-between; }
+  header h1 { color: var(--white); font-size: 13px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; }
+  header span { color: var(--gray); font-size: 11px; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; }
+
+  .toolbar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 40px; display: flex; align-items: center; gap: 0; }
+  .tab { padding: 16px 24px; font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Montserrat', sans-serif; }
+  .tab.active { color: var(--black); border-bottom: 2px solid var(--black); }
+  .tab:hover { color: var(--black); }
+
+  .legend { display: flex; gap: 24px; padding: 14px 40px; background: var(--white); border-bottom: 1px solid var(--border); }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); }
+  .legend-dot { width: 10px; height: 10px; }
+  .legend-dot.craft { background: var(--black); }
+  .legend-dot.editorial { background: var(--gray); }
+  .legend-dot.community { background: var(--community); }
+
+  .filters { padding: 20px 40px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .filter-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); margin-right: 4px; }
+  .filter-btn { padding: 6px 16px; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid var(--border); background: var(--white); cursor: pointer; transition: all 0.15s; color: var(--gray); }
+  .filter-btn.active, .filter-btn:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+  .add-btn { margin-left: auto; padding: 8px 20px; background: var(--black); color: var(--white); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; border: none; cursor: pointer; transition: opacity 0.2s; }
+  .add-btn:hover { opacity: 0.7; }
+
+  .main { padding: 0 40px 60px; }
+
+  /* TABLE */
+  .view { display: none; }
+  .view.active { display: block; }
+  table { width: 100%; border-collapse: collapse; background: var(--white); }
+  thead tr { border-bottom: 2px solid var(--black); }
+  th { padding: 14px 16px; text-align: left; font-size: 9px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gray); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; cursor: pointer; }
+  tbody tr:hover { background: var(--row-hover); }
+  td { padding: 13px 16px; font-size: 12px; color: var(--black); vertical-align: middle; }
+  .tag { display: inline-block; padding: 3px 10px; font-size: 9px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
+  .tag.craft { background: var(--black); color: var(--white); }
+  .tag.editorial { background: var(--gray); color: var(--white); }
+  .tag.community { background: var(--community); color: var(--white); }
+  .status { display: inline-block; padding: 3px 10px; font-size: 9px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border: 1px solid var(--border); color: var(--gray); }
+  .status.idea { border-color: #ccc; color: #999; }
+  .status.production { border-color: #808080; color: #808080; }
+  .status.ready { border-color: #000; color: #000; }
+  .status.published { background: #000; color: #fff; border-color: #000; }
+  .subarea-text { font-size: 10px; color: var(--gray); font-weight: 300; }
+
+  /* BOARD */
+  #boardView.active { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .board-col-header { padding: 12px 0; font-size: 9px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gray); border-bottom: 2px solid var(--black); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+  .board-col-header span { background: var(--black); color: var(--white); font-size: 9px; padding: 2px 7px; }
+  .board-card { background: var(--white); padding: 16px; margin-bottom: 8px; border-left: 3px solid transparent; cursor: pointer; transition: transform 0.15s; }
+  .board-card:hover { transform: translateX(3px); }
+  .board-card.craft { border-left-color: var(--black); }
+  .board-card.editorial { border-left-color: var(--gray); }
+  .board-card.community { border-left-color: var(--community); }
+  .board-card-title { font-size: 12px; font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
+  .board-card-meta { display: flex; align-items: center; justify-content: space-between; }
+  .board-card-date { font-size: 10px; color: var(--gray); font-weight: 300; }
+
+  /* CALENDAR */
+  .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+  .cal-nav { display: flex; align-items: center; gap: 20px; }
+  .cal-nav button { background: none; border: 1px solid var(--border); padding: 6px 14px; cursor: pointer; font-family: 'Montserrat', sans-serif; font-size: 12px; }
+  .cal-nav button:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+  .cal-month { font-size: 12px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; }
+  .cal-grid { background: var(--white); display: grid; grid-template-columns: repeat(7, 1fr); border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
+  .cal-day-label { padding: 10px; font-size: 9px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: center; }
+  .cal-cell { min-height: 90px; padding: 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .cal-cell.empty { background: #f8f8f8; }
+  .cal-date { font-size: 11px; font-weight: 400; margin-bottom: 5px; color: var(--gray); }
+  .cal-date-today { background: var(--black); color: var(--white); width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; font-size: 10px; }
+  .cal-event { font-size: 9px; padding: 3px 6px; margin-bottom: 3px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+  .cal-event.craft { background: var(--black); color: var(--white); }
+  .cal-event.editorial { background: var(--gray); color: var(--white); }
+  .cal-event.community { background: var(--community); color: var(--white); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.active { display: flex; }
+  .modal { background: var(--white); width: 520px; max-height: 88vh; overflow-y: auto; padding: 40px; }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
+  .modal-title { font-size: 11px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; }
+  .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--gray); }
+  .field { margin-bottom: 20px; }
+  .field label { display: block; font-size: 9px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); margin-bottom: 7px; }
+  .field input, .field select, .field textarea { width: 100%; padding: 10px 14px; border: 1px solid var(--border); font-family: 'Montserrat', sans-serif; font-size: 12px; color: var(--black); background: var(--white); outline: none; transition: border-color 0.15s; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--black); }
+  .field textarea { resize: vertical; min-height: 75px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .modal-actions { display: flex; gap: 12px; margin-top: 28px; }
+  .btn-primary { flex: 1; padding: 12px; background: var(--black); color: var(--white); border: none; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; cursor: pointer; }
+  .btn-primary:hover { opacity: 0.8; }
+  .btn-danger { padding: 12px 16px; background: none; color: #cc3333; border: 1px solid #cc3333; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+  .btn-secondary { padding: 12px 20px; background: none; color: var(--gray); border: 1px solid var(--border); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; }
+
+  /* LOADING */
+  .loading { padding: 60px; text-align: center; color: var(--gray); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; background: var(--white); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--black); color: var(--white); padding: 12px 28px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
+  .toast.show { opacity: 1; }
+
+  @media (max-width: 768px) {
+    header, .toolbar, .filters, .main, .legend { padding-left: 16px; padding-right: 16px; }
+    #boardView.active { grid-template-columns: 1fr 1fr; }
+    .field-row { grid-template-columns: 1fr; }
+    .modal { width: 94vw; padding: 24px; }
+    th:nth-child(n+5), td:nth-child(n+5) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>LomaLab</h1>
+  <span>Content Calendar</span>
+</header>
+
+<div class="toolbar">
+  <button class="tab active" onclick="switchTab('table')">Tabella</button>
+  <button class="tab" onclick="switchTab('board')">Board</button>
+  <button class="tab" onclick="switchTab('calendar')">Calendario</button>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot craft"></div>Craft</div>
+  <div class="legend-item"><div class="legend-dot editorial"></div>Editorial</div>
+  <div class="legend-item"><div class="legend-dot community"></div>Community</div>
+</div>
+
+<div class="filters">
+  <span class="filter-label">Filtra</span>
+  <button class="filter-btn active" onclick="filterBy('all',this)">Tutti</button>
+  <button class="filter-btn" onclick="filterBy('craft',this)">Craft</button>
+  <button class="filter-btn" onclick="filterBy('editorial',this)">Editorial</button>
+  <button class="filter-btn" onclick="filterBy('community',this)">Community</button>
+  <button class="add-btn" onclick="openModal()">+ Aggiungi</button>
+</div>
+
+<div class="main">
+  <div class="view active" id="tableView">
+    <table>
+      <thead>
+        <tr>
+          <th>Titolo</th>
+          <th>Data</th>
+          <th>Area</th>
+          <th>Sotto Area</th>
+          <th>Formato</th>
+          <th>Piattaforma</th>
+          <th>Status</th>
+          <th>Note</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"><tr><td colspan="8"><div class="loading">Caricamento...</div></td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="view" id="boardView">
+    <div class="board-col">
+      <div class="board-col-header">Idea <span id="count-idea">0</span></div>
+      <div id="col-idea"></div>
+    </div>
+    <div class="board-col">
+      <div class="board-col-header">In Produzione <span id="count-production">0</span></div>
+      <div id="col-production"></div>
+    </div>
+    <div class="board-col">
+      <div class="board-col-header">Pronto <span id="count-ready">0</span></div>
+      <div id="col-ready"></div>
+    </div>
+    <div class="board-col">
+      <div class="board-col-header">Pubblicato <span id="count-published">0</span></div>
+      <div id="col-published"></div>
+    </div>
+  </div>
+
+  <div class="view" id="calendarView">
+    <div class="cal-header">
+      <div class="cal-nav">
+        <button onclick="prevMonth()">←</button>
+        <span class="cal-month" id="calMonth"></span>
+        <button onclick="nextMonth()">→</button>
+      </div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Nuovo Contenuto</span>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="field">
+      <label>Titolo</label>
+      <input type="text" id="fTitle" placeholder="Es. Camicia sand — dettaglio colletto">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Data Pubblicazione</label>
+        <input type="date" id="fDate">
+      </div>
+      <div class="field">
+        <label>Settimana</label>
+        <select id="fWeek">
+          <option value="">—</option>
+          <option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Macro Area</label>
+        <select id="fArea" onchange="updateSubarea()">
+          <option value="">—</option>
+          <option value="craft">CRAFT</option>
+          <option value="editorial">EDITORIAL</option>
+          <option value="community">COMMUNITY</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Sotto Area</label>
+        <select id="fSubarea">
+          <option value="">—</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Formato</label>
+        <select id="fFormat">
+          <option value="">—</option>
+          <option>Feed Post</option><option>Diptych</option><option>Reel</option><option>Story</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Piattaforma</label>
+        <select id="fPlatform">
+          <option value="">—</option>
+          <option>Instagram Feed</option><option>Instagram Reel</option><option>Instagram Stories</option><option>TikTok</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Status</label>
+      <select id="fStatus">
+        <option value="idea">Idea</option>
+        <option value="production">In Produzione</option>
+        <option value="ready">Pronto</option>
+        <option value="published">Pubblicato</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Caption</label>
+      <textarea id="fCaption" placeholder="Copy del post..."></textarea>
+    </div>
+    <div class="field">
+      <label>Link Asset</label>
+      <input type="url" id="fAsset" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>Note</label>
+      <textarea id="fNotes" placeholder="Note interne..." style="min-height:60px"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Annulla</button>
+      <button class="btn-danger" id="deleteBtn" onclick="deleteContent()" style="display:none">Elimina</button>
+      <button class="btn-primary" onclick="saveContent()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://sfvnqthiidcqkahyibdo.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNmdm5xdGhpaWRjcWthaHlpYmRvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA2NDE0OTMsImV4cCI6MjA5NjIxNzQ5M30.rMUsO2LNHxcW-_O8yFzHv2llGmaDALfJed_YGSWDdHY';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const subareas = {
+  craft: ['Prodotto', 'Processo'],
+  editorial: ['Shooting Minimal', 'Idea Creativa'],
+  community: []
+};
+
+let contents = [];
+let currentFilter = 'all';
+let currentTab = 'table';
+let editingId = null;
+let calDate = new Date();
+
+// LOAD DATA
+async function loadContents() {
+  const { data, error } = await db.from('contents').select('*').order('created_at', { ascending: false });
+  if (error) { showToast('Errore connessione'); return; }
+  contents = data || [];
+  render();
+}
+
+// REALTIME
+db.channel('contents').on('postgres_changes', { event: '*', schema: 'public', table: 'contents' }, () => {
+  loadContents();
+}).subscribe();
+
+function filtered() {
+  if (currentFilter === 'all') return contents;
+  return contents.filter(c => c.area === currentFilter);
+}
+
+function statusLabel(s) {
+  return { idea: 'Idea', production: 'In Produzione', ready: 'Pronto', published: 'Pubblicato' }[s] || s;
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const [y, m, day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['table','board','calendar'][i] === tab));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(tab + 'View').classList.add('active');
+  render();
+}
+
+function filterBy(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function render() {
+  if (currentTab === 'table') renderTable();
+  else if (currentTab === 'board') renderBoard();
+  else renderCalendar();
+}
+
+function renderTable() {
+  const data = filtered();
+  const tbody = document.getElementById('tableBody');
+  if (!data.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="loading">Nessun contenuto. Aggiungi il primo.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(c => `
+    <tr onclick="editContent('${c.id}')">
+      <td style="font-weight:500">${c.title}</td>
+      <td>${formatDate(c.date)}</td>
+      <td><span class="tag ${c.area}">${(c.area||'').toUpperCase()}</span></td>
+      <td><span class="subarea-text">${c.subarea || '—'}</span></td>
+      <td>${c.format || '—'}</td>
+      <td>${c.platform || '—'}</td>
+      <td><span class="status ${c.status}">${statusLabel(c.status)}</span></td>
+      <td><span class="subarea-text">${c.notes || '—'}</span></td>
+    </tr>`).join('');
+}
+
+function renderBoard() {
+  const cols = { idea: [], production: [], ready: [], published: [] };
+  filtered().forEach(c => { if (cols[c.status]) cols[c.status].push(c); });
+  Object.entries(cols).forEach(([status, items]) => {
+    document.getElementById(`count-${status}`).textContent = items.length;
+    document.getElementById(`col-${status}`).innerHTML = items.map(c => `
+      <div class="board-card ${c.area}" onclick="editContent('${c.id}')">
+        <div class="board-card-title">${c.title}</div>
+        <div class="board-card-meta">
+          <span class="tag ${c.area}" style="font-size:8px;padding:2px 7px">${(c.area||'').toUpperCase()}</span>
+          <span class="board-card-date">${formatDate(c.date)}</span>
+        </div>
+      </div>`).join('');
+  });
+}
+
+function renderCalendar() {
+  const months = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+  document.getElementById('calMonth').textContent = `${months[calDate.getMonth()]} ${calDate.getFullYear()}`;
+  const grid = document.getElementById('calGrid');
+  const days = ['LUN','MAR','MER','GIO','VEN','SAB','DOM'];
+  let html = days.map(d => `<div class="cal-day-label">${d}</div>`).join('');
+  const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1);
+  const lastDay = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0);
+  let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay()-1;
+  for (let i = 0; i < startDow; i++) html += `<div class="cal-cell empty"></div>`;
+  const today = new Date();
+  for (let d = 1; d <= lastDay.getDate(); d++) {
+    const ds = `${calDate.getFullYear()}-${String(calDate.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getDate()===d && today.getMonth()===calDate.getMonth() && today.getFullYear()===calDate.getFullYear();
+    const dayItems = filtered().filter(c => c.date === ds);
+    const dateHtml = isToday ? `<div class="cal-date"><span class="cal-date-today">${d}</span></div>` : `<div class="cal-date">${d}</div>`;
+    const eventsHtml = dayItems.map(c => `<div class="cal-event ${c.area}" onclick="editContent('${c.id}')" title="${c.title}">${c.title}</div>`).join('');
+    html += `<div class="cal-cell">${dateHtml}${eventsHtml}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function prevMonth() { calDate.setMonth(calDate.getMonth()-1); renderCalendar(); }
+function nextMonth() { calDate.setMonth(calDate.getMonth()+1); renderCalendar(); }
+
+function updateSubarea() {
+  const area = document.getElementById('fArea').value;
+  const sel = document.getElementById('fSubarea');
+  sel.innerHTML = '<option value="">—</option>';
+  (subareas[area] || []).forEach(s => {
+    const o = document.createElement('option');
+    o.value = s; o.textContent = s; sel.appendChild(o);
+  });
+}
+
+function openModal(id = null) {
+  editingId = id;
+  document.getElementById('modalTitle').textContent = id ? 'Modifica Contenuto' : 'Nuovo Contenuto';
+  document.getElementById('deleteBtn').style.display = id ? 'block' : 'none';
+  if (id) {
+    const c = contents.find(x => x.id === id);
+    document.getElementById('fTitle').value = c.title || '';
+    document.getElementById('fDate').value = c.date || '';
+    document.getElementById('fWeek').value = c.week || '';
+    document.getElementById('fArea').value = c.area || '';
+    updateSubarea();
+    document.getElementById('fSubarea').value = c.subarea || '';
+    document.getElementById('fFormat').value = c.format || '';
+    document.getElementById('fPlatform').value = c.platform || '';
+    document.getElementById('fStatus').value = c.status || 'idea';
+    document.getElementById('fCaption').value = c.caption || '';
+    document.getElementById('fAsset').value = c.asset || '';
+    document.getElementById('fNotes').value = c.notes || '';
+  } else {
+    ['fTitle','fDate','fCaption','fAsset','fNotes'].forEach(id => document.getElementById(id).value = '');
+    ['fWeek','fArea','fFormat','fPlatform'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('fStatus').value = 'idea';
+    updateSubarea();
+  }
+  document.getElementById('modalOverlay').classList.add('active');
+}
+
+function editContent(id) { openModal(id); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); editingId = null; }
+
+async function saveContent() {
+  const c = {
+    title: document.getElementById('fTitle').value || 'Senza titolo',
+    date: document.getElementById('fDate').value,
+    week: document.getElementById('fWeek').value,
+    area: document.getElementById('fArea').value,
+    subarea: document.getElementById('fSubarea').value,
+    format: document.getElementById('fFormat').value,
+    platform: document.getElementById('fPlatform').value,
+    status: document.getElementById('fStatus').value,
+    caption: document.getElementById('fCaption').value,
+    asset: document.getElementById('fAsset').value,
+    notes: document.getElementById('fNotes').value,
+  };
+  if (editingId) {
+    await db.from('contents').update(c).eq('id', editingId);
+    showToast('Salvato');
+  } else {
+    await db.from('contents').insert([c]);
+    showToast('Aggiunto');
+  }
+  closeModal();
+  loadContents();
+}
+
+async function deleteContent() {
+  if (!editingId) return;
+  await db.from('contents').delete().eq('id', editingId);
+  showToast('Eliminato');
+  closeModal();
+  loadContents();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+loadContents();
+</script>
+</body>
+</html>
