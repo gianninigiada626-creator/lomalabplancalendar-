@@ -22,6 +22,7 @@
   .tab { padding: 16px 24px; font-size: 11px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'Montserrat', sans-serif; }
   .tab.active { color: var(--black); border-bottom: 2px solid var(--black); }
   .tab:hover { color: var(--black); }
+  .tab-divider { width: 1px; height: 20px; background: var(--border); margin: 0 8px; align-self: center; }
 
   .legend { display: flex; gap: 24px; padding: 14px 40px; background: var(--white); border-bottom: 1px solid var(--border); }
   .legend-item { display: flex; align-items: center; gap: 8px; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray); }
@@ -38,6 +39,10 @@
   .add-btn:hover { opacity: 0.7; }
 
   .main { padding: 0 40px 60px; }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
 
   /* TABLE */
   .view { display: none; }
@@ -89,6 +94,35 @@
   .cal-event.editorial { background: var(--gray); color: var(--white); }
   .cal-event.community { background: var(--community); color: var(--white); }
 
+  /* IDEAS SECTION */
+  .ideas-toolbar { padding: 20px 0; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .ideas-filter { padding: 6px 16px; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; border: 1px solid var(--border); background: var(--white); cursor: pointer; transition: all 0.15s; color: var(--gray); }
+  .ideas-filter.active, .ideas-filter:hover { background: var(--black); color: var(--white); border-color: var(--black); }
+
+  .ideas-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+  .idea-card { background: var(--white); cursor: pointer; transition: transform 0.15s; overflow: hidden; }
+  .idea-card:hover { transform: translateY(-3px); }
+
+  .idea-card-image { width: 100%; height: 200px; object-fit: cover; display: block; background: var(--bg); }
+  .idea-card-image-placeholder { width: 100%; height: 200px; background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray); }
+
+  .idea-card-body { padding: 20px; }
+  .idea-card-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+  .idea-card-desc { font-size: 11px; color: var(--gray); font-weight: 300; line-height: 1.6; margin-bottom: 16px; }
+
+  .idea-card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .idea-status-tag { display: inline-block; padding: 3px 10px; font-size: 9px; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; }
+  .idea-status-tag.valutazione { border: 1px solid var(--gray); color: var(--gray); }
+  .idea-status-tag.approvato { background: var(--black); color: var(--white); }
+  .idea-status-tag.archiviato { border: 1px solid var(--border); color: #bbb; }
+
+  .vote-section { display: flex; align-items: center; gap: 12px; }
+  .vote-btn { background: none; border: 1px solid var(--border); padding: 6px 14px; font-family: 'Montserrat', sans-serif; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; color: var(--gray); }
+  .vote-btn:hover { border-color: var(--black); color: var(--black); }
+  .vote-btn.voted { background: var(--black); color: var(--white); border-color: var(--black); }
+  .vote-count { font-size: 12px; font-weight: 600; color: var(--black); }
+
   /* MODAL */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.active { display: flex; }
@@ -108,19 +142,22 @@
   .btn-danger { padding: 12px 16px; background: none; color: #cc3333; border: 1px solid #cc3333; font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
   .btn-secondary { padding: 12px 20px; background: none; color: var(--gray); border: 1px solid var(--border); font-family: 'Montserrat', sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; cursor: pointer; }
 
-  /* LOADING */
   .loading { padding: 60px; text-align: center; color: var(--gray); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; background: var(--white); }
+  .empty-ideas { padding: 80px 40px; text-align: center; color: var(--gray); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; }
 
-  /* TOAST */
   .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--black); color: var(--white); padding: 12px 28px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
   .toast.show { opacity: 1; }
 
+  @media (max-width: 900px) {
+    .ideas-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   @media (max-width: 768px) {
     header, .toolbar, .filters, .main, .legend { padding-left: 16px; padding-right: 16px; }
     #boardView.active { grid-template-columns: 1fr 1fr; }
     .field-row { grid-template-columns: 1fr; }
     .modal { width: 94vw; padding: 24px; }
     th:nth-child(n+5), td:nth-child(n+5) { display: none; }
+    .ideas-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -132,158 +169,150 @@
 </header>
 
 <div class="toolbar">
-  <button class="tab active" onclick="switchTab('table')">Tabella</button>
-  <button class="tab" onclick="switchTab('board')">Board</button>
-  <button class="tab" onclick="switchTab('calendar')">Calendario</button>
+  <button class="tab active" onclick="switchSection('calendar')">Calendario</button>
+  <div class="tab-divider"></div>
+  <button class="tab" onclick="switchSection('ideas')">Idee Format</button>
 </div>
 
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot craft"></div>Craft</div>
-  <div class="legend-item"><div class="legend-dot editorial"></div>Editorial</div>
-  <div class="legend-item"><div class="legend-dot community"></div>Community</div>
-</div>
-
-<div class="filters">
-  <span class="filter-label">Filtra</span>
-  <button class="filter-btn active" onclick="filterBy('all',this)">Tutti</button>
-  <button class="filter-btn" onclick="filterBy('craft',this)">Craft</button>
-  <button class="filter-btn" onclick="filterBy('editorial',this)">Editorial</button>
-  <button class="filter-btn" onclick="filterBy('community',this)">Community</button>
-  <button class="add-btn" onclick="openModal()">+ Aggiungi</button>
-</div>
-
-<div class="main">
-  <div class="view active" id="tableView">
-    <table>
-      <thead>
-        <tr>
-          <th>Titolo</th>
-          <th>Data</th>
-          <th>Area</th>
-          <th>Sotto Area</th>
-          <th>Formato</th>
-          <th>Piattaforma</th>
-          <th>Status</th>
-          <th>Note</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"><tr><td colspan="8"><div class="loading">Caricamento...</div></td></tr></tbody>
-    </table>
+<!-- CALENDAR SECTION -->
+<div class="section active" id="sectionCalendar">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot craft"></div>Craft</div>
+    <div class="legend-item"><div class="legend-dot editorial"></div>Editorial</div>
+    <div class="legend-item"><div class="legend-dot community"></div>Community</div>
+  </div>
+  <div class="filters">
+    <span class="filter-label">Filtra</span>
+    <button class="filter-btn active" onclick="filterBy('all',this)">Tutti</button>
+    <button class="filter-btn" onclick="filterBy('craft',this)">Craft</button>
+    <button class="filter-btn" onclick="filterBy('editorial',this)">Editorial</button>
+    <button class="filter-btn" onclick="filterBy('community',this)">Community</button>
+    <button class="add-btn" onclick="openContentModal()">+ Aggiungi</button>
   </div>
 
-  <div class="view" id="boardView">
-    <div class="board-col">
-      <div class="board-col-header">Idea <span id="count-idea">0</span></div>
-      <div id="col-idea"></div>
-    </div>
-    <div class="board-col">
-      <div class="board-col-header">In Produzione <span id="count-production">0</span></div>
-      <div id="col-production"></div>
-    </div>
-    <div class="board-col">
-      <div class="board-col-header">Pronto <span id="count-ready">0</span></div>
-      <div id="col-ready"></div>
-    </div>
-    <div class="board-col">
-      <div class="board-col-header">Pubblicato <span id="count-published">0</span></div>
-      <div id="col-published"></div>
-    </div>
-  </div>
-
-  <div class="view" id="calendarView">
-    <div class="cal-header">
-      <div class="cal-nav">
-        <button onclick="prevMonth()">←</button>
-        <span class="cal-month" id="calMonth"></span>
-        <button onclick="nextMonth()">→</button>
+  <div class="main">
+    <div style="background:var(--white); margin-bottom:0;">
+      <div style="padding:0; display:flex; border-bottom:1px solid var(--border);">
+        <button class="tab active" id="subtab-table" onclick="switchTab('table')" style="font-size:10px; padding:12px 20px;">Tabella</button>
+        <button class="tab" id="subtab-board" onclick="switchTab('board')" style="font-size:10px; padding:12px 20px;">Board</button>
+        <button class="tab" id="subtab-cal" onclick="switchTab('cal')" style="font-size:10px; padding:12px 20px;">Calendario</button>
       </div>
     </div>
-    <div class="cal-grid" id="calGrid"></div>
+
+    <div class="view active" id="tableView">
+      <table>
+        <thead>
+          <tr>
+            <th>Titolo</th><th>Data</th><th>Area</th><th>Sotto Area</th>
+            <th>Formato</th><th>Piattaforma</th><th>Status</th><th>Note</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"><tr><td colspan="8"><div class="loading">Caricamento...</div></td></tr></tbody>
+      </table>
+    </div>
+
+    <div class="view" id="boardView">
+      <div class="board-col"><div class="board-col-header">Idea <span id="count-idea">0</span></div><div id="col-idea"></div></div>
+      <div class="board-col"><div class="board-col-header">In Produzione <span id="count-production">0</span></div><div id="col-production"></div></div>
+      <div class="board-col"><div class="board-col-header">Pronto <span id="count-ready">0</span></div><div id="col-ready"></div></div>
+      <div class="board-col"><div class="board-col-header">Pubblicato <span id="count-published">0</span></div><div id="col-published"></div></div>
+    </div>
+
+    <div class="view" id="calView">
+      <div class="cal-header">
+        <div class="cal-nav">
+          <button onclick="prevMonth()">←</button>
+          <span class="cal-month" id="calMonth"></span>
+          <button onclick="nextMonth()">→</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>
   </div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-overlay" id="modalOverlay">
+<!-- IDEAS SECTION -->
+<div class="section" id="sectionIdeas">
+  <div class="filters">
+    <span class="filter-label">Filtra</span>
+    <button class="ideas-filter active" onclick="filterIdeas('all',this)">Tutte</button>
+    <button class="ideas-filter" onclick="filterIdeas('valutazione',this)">In Valutazione</button>
+    <button class="ideas-filter" onclick="filterIdeas('approvato',this)">Approvate</button>
+    <button class="ideas-filter" onclick="filterIdeas('archiviato',this)">Archiviate</button>
+    <button class="add-btn" onclick="openIdeaModal()">+ Nuova Idea</button>
+  </div>
+  <div class="main">
+    <div class="ideas-grid" id="ideasGrid">
+      <div class="loading">Caricamento...</div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTENT MODAL -->
+<div class="modal-overlay" id="contentModalOverlay">
   <div class="modal">
     <div class="modal-header">
-      <span class="modal-title" id="modalTitle">Nuovo Contenuto</span>
-      <button class="modal-close" onclick="closeModal()">×</button>
+      <span class="modal-title" id="contentModalTitle">Nuovo Contenuto</span>
+      <button class="modal-close" onclick="closeContentModal()">×</button>
     </div>
-    <div class="field">
-      <label>Titolo</label>
-      <input type="text" id="fTitle" placeholder="Es. Camicia sand — dettaglio colletto">
-    </div>
+    <div class="field"><label>Titolo</label><input type="text" id="fTitle" placeholder="Es. Camicia sand — dettaglio colletto"></div>
     <div class="field-row">
-      <div class="field">
-        <label>Data Pubblicazione</label>
-        <input type="date" id="fDate">
-      </div>
-      <div class="field">
-        <label>Settimana</label>
-        <select id="fWeek">
-          <option value="">—</option>
-          <option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option>
-        </select>
+      <div class="field"><label>Data Pubblicazione</label><input type="date" id="fDate"></div>
+      <div class="field"><label>Settimana</label>
+        <select id="fWeek"><option value="">—</option><option>Week 1</option><option>Week 2</option><option>Week 3</option><option>Week 4</option></select>
       </div>
     </div>
     <div class="field-row">
-      <div class="field">
-        <label>Macro Area</label>
+      <div class="field"><label>Macro Area</label>
         <select id="fArea" onchange="updateSubarea()">
-          <option value="">—</option>
-          <option value="craft">CRAFT</option>
-          <option value="editorial">EDITORIAL</option>
-          <option value="community">COMMUNITY</option>
+          <option value="">—</option><option value="craft">CRAFT</option><option value="editorial">EDITORIAL</option><option value="community">COMMUNITY</option>
         </select>
       </div>
-      <div class="field">
-        <label>Sotto Area</label>
-        <select id="fSubarea">
-          <option value="">—</option>
-        </select>
-      </div>
+      <div class="field"><label>Sotto Area</label><select id="fSubarea"><option value="">—</option></select></div>
     </div>
     <div class="field-row">
-      <div class="field">
-        <label>Formato</label>
-        <select id="fFormat">
-          <option value="">—</option>
-          <option>Feed Post</option><option>Diptych</option><option>Reel</option><option>Story</option>
-        </select>
+      <div class="field"><label>Formato</label>
+        <select id="fFormat"><option value="">—</option><option>Feed Post</option><option>Diptych</option><option>Reel</option><option>Story</option></select>
       </div>
-      <div class="field">
-        <label>Piattaforma</label>
-        <select id="fPlatform">
-          <option value="">—</option>
-          <option>Instagram Feed</option><option>Instagram Reel</option><option>Instagram Stories</option><option>TikTok</option>
-        </select>
+      <div class="field"><label>Piattaforma</label>
+        <select id="fPlatform"><option value="">—</option><option>Instagram Feed</option><option>Instagram Reel</option><option>Instagram Stories</option><option>TikTok</option></select>
       </div>
     </div>
-    <div class="field">
-      <label>Status</label>
-      <select id="fStatus">
-        <option value="idea">Idea</option>
-        <option value="production">In Produzione</option>
-        <option value="ready">Pronto</option>
-        <option value="published">Pubblicato</option>
+    <div class="field"><label>Status</label>
+      <select id="fStatus"><option value="idea">Idea</option><option value="production">In Produzione</option><option value="ready">Pronto</option><option value="published">Pubblicato</option></select>
+    </div>
+    <div class="field"><label>Caption</label><textarea id="fCaption" placeholder="Copy del post..."></textarea></div>
+    <div class="field"><label>Link Asset</label><input type="url" id="fAsset" placeholder="https://..."></div>
+    <div class="field"><label>Note</label><textarea id="fNotes" placeholder="Note interne..." style="min-height:60px"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeContentModal()">Annulla</button>
+      <button class="btn-danger" id="deleteContentBtn" onclick="deleteContent()" style="display:none">Elimina</button>
+      <button class="btn-primary" onclick="saveContent()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- IDEA MODAL -->
+<div class="modal-overlay" id="ideaModalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="ideaModalTitle">Nuova Idea Format</span>
+      <button class="modal-close" onclick="closeIdeaModal()">×</button>
+    </div>
+    <div class="field"><label>Titolo</label><input type="text" id="iTitle" placeholder="Es. Diptych — collage + modello"></div>
+    <div class="field"><label>Descrizione</label><textarea id="iDesc" placeholder="Descrivi il concept, la struttura, come funziona..."></textarea></div>
+    <div class="field"><label>Link Reference</label><input type="url" id="iRef" placeholder="https:// — link immagine o Drive"></div>
+    <div class="field"><label>Status</label>
+      <select id="iStatus">
+        <option value="valutazione">In Valutazione</option>
+        <option value="approvato">Approvato</option>
+        <option value="archiviato">Archiviato</option>
       </select>
     </div>
-    <div class="field">
-      <label>Caption</label>
-      <textarea id="fCaption" placeholder="Copy del post..."></textarea>
-    </div>
-    <div class="field">
-      <label>Link Asset</label>
-      <input type="url" id="fAsset" placeholder="https://...">
-    </div>
-    <div class="field">
-      <label>Note</label>
-      <textarea id="fNotes" placeholder="Note interne..." style="min-height:60px"></textarea>
-    </div>
     <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">Annulla</button>
-      <button class="btn-danger" id="deleteBtn" onclick="deleteContent()" style="display:none">Elimina</button>
-      <button class="btn-primary" onclick="saveContent()">Salva</button>
+      <button class="btn-secondary" onclick="closeIdeaModal()">Annulla</button>
+      <button class="btn-danger" id="deleteIdeaBtn" onclick="deleteIdea()" style="display:none">Elimina</button>
+      <button class="btn-primary" onclick="saveIdea()">Salva</button>
     </div>
   </div>
 </div>
@@ -303,27 +332,77 @@ const subareas = {
 };
 
 let contents = [];
+let ideas = [];
 let currentFilter = 'all';
+let currentIdeasFilter = 'all';
 let currentTab = 'table';
-let editingId = null;
+let currentSection = 'calendar';
+let editingContentId = null;
+let editingIdeaId = null;
 let calDate = new Date();
+let votedIdeas = JSON.parse(localStorage.getItem('lomalab_votes') || '[]');
 
-// LOAD DATA
+// INIT
+async function init() {
+  await Promise.all([loadContents(), loadIdeas()]);
+}
+
 async function loadContents() {
-  const { data, error } = await db.from('contents').select('*').order('created_at', { ascending: false });
-  if (error) { showToast('Errore connessione'); return; }
+  const { data } = await db.from('contents').select('*').order('created_at', { ascending: false });
   contents = data || [];
-  render();
+  renderCalendar();
+}
+
+async function loadIdeas() {
+  const { data } = await db.from('ideas').select('*').order('created_at', { ascending: false });
+  ideas = data || [];
+  renderIdeas();
 }
 
 // REALTIME
-db.channel('contents').on('postgres_changes', { event: '*', schema: 'public', table: 'contents' }, () => {
-  loadContents();
-}).subscribe();
+db.channel('all_changes')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'contents' }, loadContents)
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'ideas' }, loadIdeas)
+  .subscribe();
+
+// SECTIONS
+function switchSection(section) {
+  currentSection = section;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  if (section === 'calendar') {
+    document.querySelectorAll('.tab')[0].classList.add('active');
+    document.getElementById('sectionCalendar').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab')[1].classList.add('active');
+    document.getElementById('sectionIdeas').classList.add('active');
+    renderIdeas();
+  }
+}
+
+// CALENDAR TABS
+function switchTab(tab) {
+  currentTab = tab;
+  ['table','board','cal'].forEach(t => {
+    document.getElementById(t+'View').classList.remove('active');
+    document.getElementById('subtab-'+t).classList.remove('active');
+  });
+  document.getElementById(tab+'View').classList.add('active');
+  document.getElementById('subtab-'+tab).classList.add('active');
+  if (tab === 'board') renderBoard();
+  else if (tab === 'cal') renderCalendarView();
+  else renderTable();
+}
+
+function filterBy(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCalendar();
+}
 
 function filtered() {
-  if (currentFilter === 'all') return contents;
-  return contents.filter(c => c.area === currentFilter);
+  return currentFilter === 'all' ? contents : contents.filter(c => c.area === currentFilter);
 }
 
 function statusLabel(s) {
@@ -332,58 +411,40 @@ function statusLabel(s) {
 
 function formatDate(d) {
   if (!d) return '—';
-  const [y, m, day] = d.split('-');
+  const [y,m,day] = d.split('-');
   return `${day}/${m}/${y}`;
 }
 
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', ['table','board','calendar'][i] === tab));
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(tab + 'View').classList.add('active');
-  render();
-}
-
-function filterBy(f, btn) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
-
-function render() {
+function renderCalendar() {
   if (currentTab === 'table') renderTable();
   else if (currentTab === 'board') renderBoard();
-  else renderCalendar();
+  else renderCalendarView();
 }
 
 function renderTable() {
   const data = filtered();
   const tbody = document.getElementById('tableBody');
-  if (!data.length) {
-    tbody.innerHTML = `<tr><td colspan="8"><div class="loading">Nessun contenuto. Aggiungi il primo.</div></td></tr>`;
-    return;
-  }
+  if (!data.length) { tbody.innerHTML = `<tr><td colspan="8"><div class="loading">Nessun contenuto ancora.</div></td></tr>`; return; }
   tbody.innerHTML = data.map(c => `
-    <tr onclick="editContent('${c.id}')">
+    <tr onclick="openContentModal('${c.id}')">
       <td style="font-weight:500">${c.title}</td>
       <td>${formatDate(c.date)}</td>
       <td><span class="tag ${c.area}">${(c.area||'').toUpperCase()}</span></td>
-      <td><span class="subarea-text">${c.subarea || '—'}</span></td>
-      <td>${c.format || '—'}</td>
-      <td>${c.platform || '—'}</td>
+      <td><span class="subarea-text">${c.subarea||'—'}</span></td>
+      <td>${c.format||'—'}</td>
+      <td>${c.platform||'—'}</td>
       <td><span class="status ${c.status}">${statusLabel(c.status)}</span></td>
-      <td><span class="subarea-text">${c.notes || '—'}</span></td>
+      <td><span class="subarea-text">${c.notes||'—'}</span></td>
     </tr>`).join('');
 }
 
 function renderBoard() {
-  const cols = { idea: [], production: [], ready: [], published: [] };
-  filtered().forEach(c => { if (cols[c.status]) cols[c.status].push(c); });
+  const cols = { idea:[], production:[], ready:[], published:[] };
+  filtered().forEach(c => { if(cols[c.status]) cols[c.status].push(c); });
   Object.entries(cols).forEach(([status, items]) => {
     document.getElementById(`count-${status}`).textContent = items.length;
     document.getElementById(`col-${status}`).innerHTML = items.map(c => `
-      <div class="board-card ${c.area}" onclick="editContent('${c.id}')">
+      <div class="board-card ${c.area}" onclick="openContentModal('${c.id}')">
         <div class="board-card-title">${c.title}</div>
         <div class="board-card-meta">
           <span class="tag ${c.area}" style="font-size:8px;padding:2px 7px">${(c.area||'').toUpperCase()}</span>
@@ -393,7 +454,7 @@ function renderBoard() {
   });
 }
 
-function renderCalendar() {
+function renderCalendarView() {
   const months = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
   document.getElementById('calMonth').textContent = `${months[calDate.getMonth()]} ${calDate.getFullYear()}`;
   const grid = document.getElementById('calGrid');
@@ -401,66 +462,120 @@ function renderCalendar() {
   let html = days.map(d => `<div class="cal-day-label">${d}</div>`).join('');
   const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1);
   const lastDay = new Date(calDate.getFullYear(), calDate.getMonth()+1, 0);
-  let startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay()-1;
-  for (let i = 0; i < startDow; i++) html += `<div class="cal-cell empty"></div>`;
+  let startDow = firstDay.getDay()===0 ? 6 : firstDay.getDay()-1;
+  for(let i=0;i<startDow;i++) html+=`<div class="cal-cell empty"></div>`;
   const today = new Date();
-  for (let d = 1; d <= lastDay.getDate(); d++) {
-    const ds = `${calDate.getFullYear()}-${String(calDate.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-    const isToday = today.getDate()===d && today.getMonth()===calDate.getMonth() && today.getFullYear()===calDate.getFullYear();
-    const dayItems = filtered().filter(c => c.date === ds);
-    const dateHtml = isToday ? `<div class="cal-date"><span class="cal-date-today">${d}</span></div>` : `<div class="cal-date">${d}</div>`;
-    const eventsHtml = dayItems.map(c => `<div class="cal-event ${c.area}" onclick="editContent('${c.id}')" title="${c.title}">${c.title}</div>`).join('');
-    html += `<div class="cal-cell">${dateHtml}${eventsHtml}</div>`;
+  for(let d=1;d<=lastDay.getDate();d++) {
+    const ds=`${calDate.getFullYear()}-${String(calDate.getMonth()+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=today.getDate()===d&&today.getMonth()===calDate.getMonth()&&today.getFullYear()===calDate.getFullYear();
+    const dayItems=filtered().filter(c=>c.date===ds);
+    const dateHtml=isToday?`<div class="cal-date"><span class="cal-date-today">${d}</span></div>`:`<div class="cal-date">${d}</div>`;
+    html+=`<div class="cal-cell">${dateHtml}${dayItems.map(c=>`<div class="cal-event ${c.area}" onclick="openContentModal('${c.id}')" title="${c.title}">${c.title}</div>`).join('')}</div>`;
   }
   grid.innerHTML = html;
 }
 
-function prevMonth() { calDate.setMonth(calDate.getMonth()-1); renderCalendar(); }
-function nextMonth() { calDate.setMonth(calDate.getMonth()+1); renderCalendar(); }
+function prevMonth() { calDate.setMonth(calDate.getMonth()-1); renderCalendarView(); }
+function nextMonth() { calDate.setMonth(calDate.getMonth()+1); renderCalendarView(); }
 
+// IDEAS
+function filterIdeas(f, btn) {
+  currentIdeasFilter = f;
+  document.querySelectorAll('.ideas-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderIdeas();
+}
+
+function filteredIdeas() {
+  return currentIdeasFilter === 'all' ? ideas : ideas.filter(i => i.status === currentIdeasFilter);
+}
+
+function renderIdeas() {
+  const grid = document.getElementById('ideasGrid');
+  const data = filteredIdeas();
+  if (!data.length) {
+    grid.innerHTML = `<div class="empty-ideas" style="grid-column:1/-1">Nessuna idea ancora. Aggiungi la prima.</div>`;
+    return;
+  }
+  grid.innerHTML = data.map(idea => {
+    const voted = votedIdeas.includes(idea.id);
+    const imgHtml = idea.reference_url
+      ? `<img class="idea-card-image" src="${idea.reference_url}" onerror="this.parentElement.querySelector('.idea-card-image-placeholder').style.display='flex'; this.style.display='none'" /><div class="idea-card-image-placeholder" style="display:none">Nessuna Reference</div>`
+      : `<div class="idea-card-image-placeholder">Nessuna Reference</div>`;
+    return `
+      <div class="idea-card">
+        ${imgHtml}
+        <div class="idea-card-body">
+          <div class="idea-card-title">${idea.title}</div>
+          <div class="idea-card-desc">${idea.description||''}</div>
+          <div class="idea-card-footer">
+            <span class="idea-status-tag ${idea.status}">${{valutazione:'In Valutazione',approvato:'Approvato',archiviato:'Archiviato'}[idea.status]||idea.status}</span>
+            <div class="vote-section">
+              <span class="vote-count">${idea.votes||0}</span>
+              <button class="vote-btn ${voted?'voted':''}" onclick="toggleVote('${idea.id}', ${idea.votes||0}, ${voted}, this)">
+                ${voted ? '★ Votato' : '☆ Vota'}
+              </button>
+              <button class="vote-btn" onclick="openIdeaModal('${idea.id}')" style="font-size:10px">Modifica</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function toggleVote(id, currentVotes, alreadyVoted, btn) {
+  const newVotes = alreadyVoted ? currentVotes - 1 : currentVotes + 1;
+  if (alreadyVoted) {
+    votedIdeas = votedIdeas.filter(v => v !== id);
+  } else {
+    votedIdeas.push(id);
+  }
+  localStorage.setItem('lomalab_votes', JSON.stringify(votedIdeas));
+  await db.from('ideas').update({ votes: newVotes }).eq('id', id);
+  showToast(alreadyVoted ? 'Voto rimosso' : 'Voto aggiunto');
+  loadIdeas();
+}
+
+// CONTENT MODAL
 function updateSubarea() {
   const area = document.getElementById('fArea').value;
   const sel = document.getElementById('fSubarea');
   sel.innerHTML = '<option value="">—</option>';
-  (subareas[area] || []).forEach(s => {
-    const o = document.createElement('option');
-    o.value = s; o.textContent = s; sel.appendChild(o);
-  });
+  (subareas[area]||[]).forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; sel.appendChild(o); });
 }
 
-function openModal(id = null) {
-  editingId = id;
-  document.getElementById('modalTitle').textContent = id ? 'Modifica Contenuto' : 'Nuovo Contenuto';
-  document.getElementById('deleteBtn').style.display = id ? 'block' : 'none';
+function openContentModal(id=null) {
+  editingContentId = id;
+  document.getElementById('contentModalTitle').textContent = id ? 'Modifica Contenuto' : 'Nuovo Contenuto';
+  document.getElementById('deleteContentBtn').style.display = id ? 'block' : 'none';
   if (id) {
-    const c = contents.find(x => x.id === id);
-    document.getElementById('fTitle').value = c.title || '';
-    document.getElementById('fDate').value = c.date || '';
-    document.getElementById('fWeek').value = c.week || '';
-    document.getElementById('fArea').value = c.area || '';
+    const c = contents.find(x=>x.id===id);
+    document.getElementById('fTitle').value=c.title||'';
+    document.getElementById('fDate').value=c.date||'';
+    document.getElementById('fWeek').value=c.week||'';
+    document.getElementById('fArea').value=c.area||'';
     updateSubarea();
-    document.getElementById('fSubarea').value = c.subarea || '';
-    document.getElementById('fFormat').value = c.format || '';
-    document.getElementById('fPlatform').value = c.platform || '';
-    document.getElementById('fStatus').value = c.status || 'idea';
-    document.getElementById('fCaption').value = c.caption || '';
-    document.getElementById('fAsset').value = c.asset || '';
-    document.getElementById('fNotes').value = c.notes || '';
+    document.getElementById('fSubarea').value=c.subarea||'';
+    document.getElementById('fFormat').value=c.format||'';
+    document.getElementById('fPlatform').value=c.platform||'';
+    document.getElementById('fStatus').value=c.status||'idea';
+    document.getElementById('fCaption').value=c.caption||'';
+    document.getElementById('fAsset').value=c.asset||'';
+    document.getElementById('fNotes').value=c.notes||'';
   } else {
-    ['fTitle','fDate','fCaption','fAsset','fNotes'].forEach(id => document.getElementById(id).value = '');
-    ['fWeek','fArea','fFormat','fPlatform'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('fStatus').value = 'idea';
+    ['fTitle','fDate','fCaption','fAsset','fNotes'].forEach(i=>document.getElementById(i).value='');
+    ['fWeek','fArea','fFormat','fPlatform'].forEach(i=>document.getElementById(i).value='');
+    document.getElementById('fStatus').value='idea';
     updateSubarea();
   }
-  document.getElementById('modalOverlay').classList.add('active');
+  document.getElementById('contentModalOverlay').classList.add('active');
 }
 
-function editContent(id) { openModal(id); }
-function closeModal() { document.getElementById('modalOverlay').classList.remove('active'); editingId = null; }
+function closeContentModal() { document.getElementById('contentModalOverlay').classList.remove('active'); editingContentId=null; }
 
 async function saveContent() {
   const c = {
-    title: document.getElementById('fTitle').value || 'Senza titolo',
+    title: document.getElementById('fTitle').value||'Senza titolo',
     date: document.getElementById('fDate').value,
     week: document.getElementById('fWeek').value,
     area: document.getElementById('fArea').value,
@@ -472,37 +587,75 @@ async function saveContent() {
     asset: document.getElementById('fAsset').value,
     notes: document.getElementById('fNotes').value,
   };
-  if (editingId) {
-    await db.from('contents').update(c).eq('id', editingId);
-    showToast('Salvato');
-  } else {
-    await db.from('contents').insert([c]);
-    showToast('Aggiunto');
-  }
-  closeModal();
-  loadContents();
+  if (editingContentId) { await db.from('contents').update(c).eq('id',editingContentId); showToast('Salvato'); }
+  else { await db.from('contents').insert([c]); showToast('Aggiunto'); }
+  closeContentModal(); loadContents();
 }
 
 async function deleteContent() {
-  if (!editingId) return;
-  await db.from('contents').delete().eq('id', editingId);
-  showToast('Eliminato');
-  closeModal();
-  loadContents();
+  if (!editingContentId) return;
+  await db.from('contents').delete().eq('id',editingContentId);
+  showToast('Eliminato'); closeContentModal(); loadContents();
+}
+
+// IDEA MODAL
+function openIdeaModal(id=null) {
+  editingIdeaId = id;
+  document.getElementById('ideaModalTitle').textContent = id ? 'Modifica Idea' : 'Nuova Idea Format';
+  document.getElementById('deleteIdeaBtn').style.display = id ? 'block' : 'none';
+  if (id) {
+    const idea = ideas.find(x=>x.id===id);
+    document.getElementById('iTitle').value=idea.title||'';
+    document.getElementById('iDesc').value=idea.description||'';
+    document.getElementById('iRef').value=idea.reference_url||'';
+    document.getElementById('iStatus').value=idea.status||'valutazione';
+  } else {
+    document.getElementById('iTitle').value='';
+    document.getElementById('iDesc').value='';
+    document.getElementById('iRef').value='';
+    document.getElementById('iStatus').value='valutazione';
+  }
+  document.getElementById('ideaModalOverlay').classList.add('active');
+}
+
+function closeIdeaModal() { document.getElementById('ideaModalOverlay').classList.remove('active'); editingIdeaId=null; }
+
+async function saveIdea() {
+  const idea = {
+    title: document.getElementById('iTitle').value||'Senza titolo',
+    description: document.getElementById('iDesc').value,
+    reference_url: document.getElementById('iRef').value,
+    status: document.getElementById('iStatus').value,
+    votes: 0,
+  };
+  if (editingIdeaId) {
+    const existing = ideas.find(x=>x.id===editingIdeaId);
+    idea.votes = existing.votes||0;
+    await db.from('ideas').update(idea).eq('id',editingIdeaId);
+    showToast('Salvato');
+  } else {
+    await db.from('ideas').insert([idea]);
+    showToast('Idea aggiunta');
+  }
+  closeIdeaModal(); loadIdeas();
+}
+
+async function deleteIdea() {
+  if (!editingIdeaId) return;
+  await db.from('ideas').delete().eq('id',editingIdeaId);
+  showToast('Eliminata'); closeIdeaModal(); loadIdeas();
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2000);
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2000);
 }
 
-document.getElementById('modalOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+document.getElementById('contentModalOverlay').addEventListener('click',function(e){if(e.target===this)closeContentModal();});
+document.getElementById('ideaModalOverlay').addEventListener('click',function(e){if(e.target===this)closeIdeaModal();});
 
-loadContents();
+init();
 </script>
 </body>
 </html>
