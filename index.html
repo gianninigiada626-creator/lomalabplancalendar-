@@ -148,6 +148,35 @@
   .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: var(--black); color: var(--white); padding: 12px 28px; font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 200; }
   .toast.show { opacity: 1; }
 
+
+  /* TASKS */
+  .tasks-wrapper { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .tasks-col { background: var(--white); }
+  .tasks-col-header { padding: 18px 20px 14px; border-bottom: 2px solid var(--black); display: flex; align-items: center; justify-content: space-between; }
+  .tasks-col-title { font-size: 10px; font-weight: 600; letter-spacing: 0.25em; text-transform: uppercase; }
+  .tasks-col-sub { margin-top: 4px; font-size: 9px; color: var(--gray); letter-spacing: 0.15em; text-transform: uppercase; font-weight: 400; }
+  .tasks-list { padding: 12px 0; }
+  .task-person-group { padding: 0 20px; margin-bottom: 4px; }
+  .task-person-label { font-size: 9px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray); padding: 10px 0 6px; border-bottom: 1px solid var(--border); margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .task-add-btn { background: none; border: none; cursor: pointer; font-size: 16px; color: var(--gray); line-height: 1; padding: 0 4px; font-family: 'Montserrat', sans-serif; }
+  .task-add-btn:hover { color: var(--black); }
+  .task-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+  .task-item:last-child { border-bottom: none; }
+  .task-check { width: 16px; height: 16px; border: 1px solid var(--border); cursor: pointer; flex-shrink: 0; margin-top: 2px; appearance: none; background: var(--white); transition: all 0.15s; }
+  .task-check:checked { background: var(--black); border-color: var(--black); }
+  .task-check:checked::after { content: '✓'; display: block; color: white; font-size: 10px; text-align: center; line-height: 14px; }
+  .task-body { flex: 1; }
+  .task-title { font-size: 12px; font-weight: 400; line-height: 1.4; margin-bottom: 3px; }
+  .task-due { font-size: 10px; color: var(--gray); font-weight: 300; }
+  .task-due.overdue { color: #cc3333; }
+  .task-inline-form { display: flex; gap: 8px; padding: 8px 0; align-items: center; flex-wrap: wrap; }
+  .task-inline-input { border: none; border-bottom: 1px solid var(--border); font-family: 'Montserrat', sans-serif; font-size: 12px; color: var(--black); padding: 4px 0; outline: none; flex: 1; min-width: 120px; background: transparent; }
+  .task-inline-input:focus { border-bottom-color: var(--black); }
+  .task-inline-date { border: none; border-bottom: 1px solid var(--border); font-family: 'Montserrat', sans-serif; font-size: 10px; color: var(--gray); padding: 4px 0; outline: none; background: transparent; }
+  .task-inline-save { padding: 4px 12px; background: var(--black); color: var(--white); border: none; font-family: 'Montserrat', sans-serif; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; }
+  .task-inline-cancel { padding: 4px 8px; background: none; color: var(--gray); border: none; font-family: 'Montserrat', sans-serif; font-size: 9px; cursor: pointer; }
+  .tasks-empty { padding: 16px 20px; font-size: 11px; color: #ccc; font-style: italic; }
+
   @media (max-width: 900px) {
     .ideas-grid { grid-template-columns: repeat(2, 1fr); }
   }
@@ -172,6 +201,8 @@
   <button class="tab active" onclick="switchSection('calendar')">Calendario</button>
   <div class="tab-divider"></div>
   <button class="tab" onclick="switchSection('ideas')">Idee Format</button>
+  <div class="tab-divider"></div>
+  <button class="tab" onclick="switchSection('tasks')">Task Team</button>
 </div>
 
 <!-- CALENDAR SECTION -->
@@ -317,6 +348,76 @@
   </div>
 </div>
 
+
+<!-- TASKS SECTION -->
+<div class="section" id="sectionTasks">
+  <div class="filters">
+    <span class="filter-label">Task Team</span>
+    <div style="margin-left:auto; font-size:10px; color:var(--gray); letter-spacing:0.1em; text-transform:uppercase;">Spunta per completare — scompare automaticamente</div>
+  </div>
+  <div class="main">
+    <div class="tasks-wrapper" id="tasksWrapper">
+      <!-- LATO GRAFICO -->
+      <div class="tasks-col">
+        <div class="tasks-col-header">
+          <div>
+            <div class="tasks-col-title">Lato Grafico</div>
+          </div>
+        </div>
+        <div class="tasks-list" id="tasks-grafico">
+          <div class="task-person-group">
+            <div class="task-person-label">Camilla <button class="task-add-btn" onclick="showInlineForm('camilla')">+</button></div>
+            <div id="tasks-camilla"></div>
+            <div id="form-camilla" style="display:none"></div>
+          </div>
+          <div class="task-person-group">
+            <div class="task-person-label">Vincenzo <button class="task-add-btn" onclick="showInlineForm('vincenzo')">+</button></div>
+            <div id="tasks-vincenzo"></div>
+            <div id="form-vincenzo" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUZIONE -->
+      <div class="tasks-col">
+        <div class="tasks-col-header">
+          <div>
+            <div class="tasks-col-title">Produzione</div>
+          </div>
+        </div>
+        <div class="tasks-list">
+          <div class="task-person-group">
+            <div class="task-person-label">Giada <button class="task-add-btn" onclick="showInlineForm('giada')">+</button></div>
+            <div id="tasks-giada"></div>
+            <div id="form-giada" style="display:none"></div>
+          </div>
+          <div class="task-person-group">
+            <div class="task-person-label">Ema <button class="task-add-btn" onclick="showInlineForm('ema')">+</button></div>
+            <div id="tasks-ema"></div>
+            <div id="form-ema" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- OPERATIVO -->
+      <div class="tasks-col">
+        <div class="tasks-col-header">
+          <div>
+            <div class="tasks-col-title">Operativo</div>
+          </div>
+        </div>
+        <div class="tasks-list">
+          <div class="task-person-group">
+            <div class="task-person-label">Federica <button class="task-add-btn" onclick="showInlineForm('federica')">+</button></div>
+            <div id="tasks-federica"></div>
+            <div id="form-federica" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -344,7 +445,7 @@ let votedIdeas = JSON.parse(localStorage.getItem('lomalab_votes') || '[]');
 
 // INIT
 async function init() {
-  await Promise.all([loadContents(), loadIdeas()]);
+  await Promise.all([loadContents(), loadIdeas(), loadTasks()]);
 }
 
 async function loadContents() {
@@ -370,13 +471,17 @@ function switchSection(section) {
   currentSection = section;
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const tabs = document.querySelectorAll('.toolbar > .tab');
+  const sections = { calendar: 0, ideas: 1, tasks: 2 };
+  if (tabs[sections[section]]) tabs[sections[section]].classList.add('active');
   if (section === 'calendar') {
-    document.querySelectorAll('.tab')[0].classList.add('active');
     document.getElementById('sectionCalendar').classList.add('active');
-  } else {
-    document.querySelectorAll('.tab')[1].classList.add('active');
+  } else if (section === 'ideas') {
     document.getElementById('sectionIdeas').classList.add('active');
     renderIdeas();
+  } else if (section === 'tasks') {
+    document.getElementById('sectionTasks').classList.add('active');
+    renderTasks();
   }
 }
 
@@ -655,7 +760,105 @@ function showToast(msg) {
 document.getElementById('contentModalOverlay').addEventListener('click',function(e){if(e.target===this)closeContentModal();});
 document.getElementById('ideaModalOverlay').addEventListener('click',function(e){if(e.target===this)closeIdeaModal();});
 
-init();
+
+  // TASKS
+  let tasks = [];
+
+  async function loadTasks() {
+    const { data } = await db.from('tasks').select('*').eq('done', false).order('created_at', { ascending: true });
+    tasks = data || [];
+    renderTasks();
+  }
+
+  db.channel('tasks_changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks' }, loadTasks)
+    .subscribe();
+
+  const assignees = ['camilla','vincenzo','giada','ema','federica'];
+
+  function renderTasks() {
+    assignees.forEach(person => {
+      const el = document.getElementById('tasks-' + person);
+      if (!el) return;
+      const personTasks = tasks.filter(t => t.assignee === person && !t.done);
+      if (!personTasks.length) {
+        el.innerHTML = '<div class="tasks-empty">Nessun task</div>';
+        return;
+      }
+      el.innerHTML = personTasks.map(t => {
+        const today = new Date().toISOString().split('T')[0];
+        const overdue = t.due_date && t.due_date < today;
+        const dueLabel = t.due_date ? formatDate(t.due_date) : '';
+        return `
+          <div class="task-item" id="task-${t.id}">
+            <input type="checkbox" class="task-check" onchange="completeTask('${t.id}', this)">
+            <div class="task-body">
+              <div class="task-title">${t.title}</div>
+              ${dueLabel ? `<div class="task-due ${overdue ? 'overdue' : ''}">Entro ${dueLabel}${overdue ? ' — scaduto' : ''}</div>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    });
+  }
+
+  async function completeTask(id, checkbox) {
+    checkbox.disabled = true;
+    const taskEl = document.getElementById('task-' + id);
+    if (taskEl) {
+      taskEl.style.opacity = '0';
+      taskEl.style.transition = 'opacity 0.4s';
+    }
+    await db.from('tasks').update({ done: true }).eq('id', id);
+    showToast('Task completato ✓');
+    setTimeout(() => loadTasks(), 400);
+  }
+
+  function showInlineForm(person) {
+    const formEl = document.getElementById('form-' + person);
+    formEl.style.display = 'block';
+    formEl.innerHTML = `
+      <div class="task-inline-form">
+        <input type="text" class="task-inline-input" id="input-${person}" placeholder="Descrivi il task..." />
+        <input type="date" class="task-inline-date" id="date-${person}" />
+        <button class="task-inline-save" onclick="addTask('${person}')">Aggiungi</button>
+        <button class="task-inline-cancel" onclick="hideInlineForm('${person}')">×</button>
+      </div>`;
+    document.getElementById('input-' + person).focus();
+  }
+
+  function hideInlineForm(person) {
+    const formEl = document.getElementById('form-' + person);
+    formEl.style.display = 'none';
+    formEl.innerHTML = '';
+  }
+
+  const areaMap = { camilla: 'grafico', vincenzo: 'grafico', giada: 'produzione', ema: 'produzione', federica: 'operativo' };
+
+  async function addTask(person) {
+    const title = document.getElementById('input-' + person).value.trim();
+    if (!title) return;
+    const due = document.getElementById('date-' + person).value;
+    await db.from('tasks').insert([{
+      title,
+      due_date: due || null,
+      assignee: person,
+      team_area: areaMap[person],
+      done: false
+    }]);
+    hideInlineForm(person);
+    showToast('Task aggiunto');
+    loadTasks();
+  }
+
+  // Enter key support
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && e.target.classList.contains('task-inline-input')) {
+      const person = e.target.id.replace('input-', '');
+      addTask(person);
+    }
+  });
+
+  init();
 </script>
 </body>
 </html>
